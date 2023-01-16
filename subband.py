@@ -85,6 +85,7 @@ fs, wavin = wavfile.read('myfile.wav')
 print(wavin.shape)
 xhat,Ytot = codec0(wavin,h,M,N)
 print(xhat.shape)
+print("Hello")
 
 
 
