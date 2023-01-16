@@ -1,8 +1,10 @@
 import numpy as np
 from scipy import signal
+from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from mp3 import make_mp3_analysisfb
 from mp3 import make_mp3_synthesisfb
+from nothing import donothing,idonothing
 from frame import frame_sub_analysis,frame_sub_synthesis
 import wave
 
@@ -33,11 +35,41 @@ def plot_frequency(H,fs):
 
 
 def codec0(wavin, h, M, N):
-    frame = wavin.readframes(M*N) 
+
     H = make_mp3_analysisfb(h, M)
-    Y = frame_sub_analysis(frame,H,20)
+    G = make_mp3_synthesisfb(h,M)
+
+    L,_ = H.shape
+    buffsize = M*(N-1)+L
+    i = 0
+    Ytot = np.empty((0,M))
+    xhat = np.empty(0)
+    yhbuff = np.empty((0,M))
+    lines_encoded = 0
+    ybuffsize = (N-1) + L//M
+
+    while (i+1)*buffsize < wavin.shape[0]:
+
+        xbuff = wavin[i*buffsize:(i+1)*buffsize]
+        Y = frame_sub_analysis(xbuff,H,N)        
+        Yc = donothing(Y)
+
+        Ytot = np.r_[Ytot,Yc]
+        Yh = idonothing(Yc)
+        yhbuff = np.r_[yhbuff,Yh]
+
+        
+        while yhbuff.shape[0] - lines_encoded >= ybuffsize:
+            ybuff = yhbuff[lines_encoded:lines_encoded+ ybuffsize, :]
+            xsynth = frame_sub_synthesis(ybuff,G)
+            #print(ybuff.shape)
+            xhat = np.r_[xhat,xsynth]
+            lines_encoded = lines_encoded + ybuff.shape[0]
 
 
+        i = i + 1
+    
+    return xhat,Ytot
 
 # calling the function
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -49,8 +81,10 @@ G = make_mp3_synthesisfb(h, M)
 #plot_frequency(H,fs)
 
 N = 36
-wavin = wave.open('myfile.wav', 'r')
-codec0(wavin,h,M,N)
+fs, wavin = wavfile.read('myfile.wav')
+print(wavin.shape)
+xhat,Ytot = codec0(wavin,h,M,N)
+print(xhat.shape)
 
 
 
