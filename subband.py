@@ -46,7 +46,7 @@ def codec0(wavin, h, M, N):
     Ytot = np.empty((0,M))
 
     while (i+1)*xbuffsize + L - M < wavin.shape[0]:
-        xbuff = wavin[i*buffsize:(i+1)*buffsize + L - M]
+        xbuff = wavin[i*xbuffsize:(i+1)*xbuffsize + L - M]
         Y = frame_sub_analysis(xbuff,H,N)        
         Yc = donothing(Y)
         Ytot = np.r_[Ytot,Yc]
