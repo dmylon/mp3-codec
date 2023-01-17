@@ -40,8 +40,8 @@ def codec0(wavin, h, M, N):
     G = make_mp3_synthesisfb(h,M)
 
     L,_ = H.shape
-    xbuffsize = M*(N-1)+L
-    ybuffsize = (N-1) + L//M
+    xbuffsize = M*N
+    ybuffsize = N
     i = 0
     Ytot = np.empty((0,M))
 
