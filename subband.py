@@ -40,24 +40,19 @@ def codec0(wavin, h, M, N):
     G = make_mp3_synthesisfb(h,M)
 
     L,_ = H.shape
-    buffsize = M*(N-1)+L
+    xbuffsize = M*(N-1)+L
+    ybuffsize = (N-1) + L//M
     i = 0
     Ytot = np.empty((0,M))
-    xhat = np.empty(0)
-    yhbuff = np.empty((0,M))
-    lines_encoded = 0
-    ybuffsize = (N-1) + L//M
 
-    while (i+1)*buffsize < wavin.shape[0]:
+    while (i+1)*xbuffsize + L - M < wavin.shape[0]:
 
-        xbuff = wavin[i*buffsize:(i+1)*buffsize]
+        xbuff = wavin[i*buffsize:(i+1)*buffsize + L - M]
         Y = frame_sub_analysis(xbuff,H,N)        
         Yc = donothing(Y)
 
         Ytot = np.r_[Ytot,Yc]
-        Yh = idonothing(Yc)
-        yhbuff = np.r_[yhbuff,Yh]
-
+        
         
         while yhbuff.shape[0] - lines_encoded >= ybuffsize:
             ybuff = yhbuff[lines_encoded:lines_encoded+ ybuffsize, :]
@@ -68,7 +63,23 @@ def codec0(wavin, h, M, N):
 
 
         i = i + 1
+        
+    i = 0
+    Yhtot = np.empty((0,M))
+    while (i+1)*ybuffsize < Ytot.shape[0]:
+        Yc = Ytot[i*ybuffsize:(i+1)*ybuffsize, :]
+        Yh = idonothing(Yc)
+        Yhtot = np.r_[Yhtot,Yh]
+        i = i + 1
     
+    i = 0
+    xhat = np.empty(0)
+    while (i+1)*ybuffsize + L//M - 1 < Ytot.shape[0]:
+        ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M - 1, :]
+        xsynth = frame_sub_synthesis(ybuff,G)
+        xhat = np.r_[xhat,xsynth]
+        i = i + 1
+     
     return xhat,Ytot
 
 # calling the function
@@ -82,11 +93,8 @@ G = make_mp3_synthesisfb(h, M)
 
 N = 36
 fs, wavin = wavfile.read('myfile.wav')
-print(wavin.shape)
 xhat,Ytot = codec0(wavin,h,M,N)
-print(xhat.shape)
-print("Hello")
-
+wavfile.write('output.wav', fs, xhat.astype(np.int16))
 
 
 
