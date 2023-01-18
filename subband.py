@@ -40,13 +40,15 @@ def codec0(wavin, h, M, N):
     G = make_mp3_synthesisfb(h,M)
 
     L,_ = H.shape
-    xbuffsize = M*N
-    ybuffsize = N
+    xbuffsize, ybuffsize = M*N, N
     i = 0
     Ytot = np.empty((0,M))
 
-    while (i+1)*xbuffsize + L - M < wavin.shape[0]:
-        xbuff = wavin[i*xbuffsize:(i+1)*xbuffsize + L - M]
+    while (i+1)*xbuffsize + L - M <= wavin.shape[0]:
+        if (i+1)*xbuffsize + L - M == wavin.shape[0]:
+            xbuff = np.r_[wavin[i*xbuffsize:(i+1)*xbuffsize],np.zeros(L-M)]
+        else:
+            xbuff = wavin[i*xbuffsize:(i+1)*xbuffsize + L - M]
         Y = frame_sub_analysis(xbuff,H,N)        
         Yc = donothing(Y)
         Ytot = np.r_[Ytot,Yc]
@@ -54,7 +56,7 @@ def codec0(wavin, h, M, N):
         
     i = 0
     Yhtot = np.empty((0,M))
-    while (i+1)*ybuffsize < Ytot.shape[0]:
+    while (i+1)*ybuffsize <= Ytot.shape[0]:
         Yc = Ytot[i*ybuffsize:(i+1)*ybuffsize, :]
         Yh = idonothing(Yc)
         Yhtot = np.r_[Yhtot,Yh]
@@ -62,8 +64,11 @@ def codec0(wavin, h, M, N):
     
     i = 0
     xhat = np.empty(0)
-    while (i+1)*ybuffsize + L//M - 1 < Ytot.shape[0]:
-        ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M - 1, :]
+    while (i+1)*ybuffsize + L//M - 1 <= Ytot.shape[0]:
+        if (i+1)*ybuffsize + L//M - 1 == Ytot.shape[0]:
+            ybuff = np.r_[Yhtot[i*ybuffsize:(i+1)*ybuffsize, :],np.zeros((L//M - 1,M))]
+        else:
+            ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M - 1, :]
         xsynth = frame_sub_synthesis(ybuff,G)
         xhat = np.r_[xhat,xsynth]
         i = i + 1
@@ -84,6 +89,16 @@ fs, wavin = wavfile.read('myfile.wav')
 xhat,Ytot = codec0(wavin,h,M,N)
 wavfile.write('output.wav', fs, xhat.astype(np.int16))
 
+wavin = wavin.astype(np.int64)
+xhat = xhat.astype(np.int64)
 
+min_mse, min_i = np.mean(np.square(wavin-xhat)), 0
+for i in np.arange(1,1000):
+  tmp_wavin, tmp_xhat = wavin[i:], xhat[:-i]
+  e = tmp_wavin - tmp_xhat 
+  mse = np.mean(np.square(e))
+  if mse < min_mse:
+    min_mse, min_i = mse, i
 
-
+SNR = np.mean(np.square(wavin[min_i:])) / min_mse
+SNRdb = 10*np.log10(SNR)
