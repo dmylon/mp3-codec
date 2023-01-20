@@ -1,12 +1,9 @@
 import numpy as np
 from scipy import signal
-from scipy.io import wavfile
 import matplotlib.pyplot as plt
-from mp3 import make_mp3_analysisfb
-from mp3 import make_mp3_synthesisfb
+from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from nothing import donothing,idonothing
 from frame import frame_sub_analysis,frame_sub_synthesis
-import wave
 
 
 def plot_frequency(H,fs):
@@ -36,8 +33,17 @@ def plot_frequency(H,fs):
 
 def codec0(wavin, h, M, N):
 
+    Ytot = coder0(wavin,h,M,N)
+    xhat = decoder0(Ytot, h, M, N)
+
+    return xhat,Ytot
+
+
+
+
+def coder0(wavin, h, M, N):
+
     H = make_mp3_analysisfb(h, M)
-    G = make_mp3_synthesisfb(h,M)
 
     L,_ = H.shape
     xbuffsize, ybuffsize = M*N, N
@@ -53,7 +59,18 @@ def codec0(wavin, h, M, N):
         Yc = donothing(Y)
         Ytot = np.r_[Ytot,Yc]
         i = i + 1
-        
+
+    return Ytot
+
+
+def decoder0(Ytot, h, M, N):
+    
+    G = make_mp3_synthesisfb(h,M)
+
+    L,_ = G.shape
+    ybuffsize = N
+
+
     i = 0
     Yhtot = np.empty((0,M))
     while (i+1)*ybuffsize <= Ytot.shape[0]:
@@ -61,7 +78,7 @@ def codec0(wavin, h, M, N):
         Yh = idonothing(Yc)
         Yhtot = np.r_[Yhtot,Yh]
         i = i + 1
-    
+
     i = 0
     xhat = np.empty(0)
     while (i+1)*ybuffsize <= Ytot.shape[0]:
@@ -72,33 +89,6 @@ def codec0(wavin, h, M, N):
         xsynth = frame_sub_synthesis(ybuff,G)
         xhat = np.r_[xhat,xsynth]
         i = i + 1
-     
-    return xhat,Ytot
 
-# calling the function
-data = np.load("h.npy", allow_pickle=True).tolist()
-h = data['h'].squeeze()
-M = 32
-fs = 44100
-H = make_mp3_analysisfb(h, M)
-G = make_mp3_synthesisfb(h, M)
-#plot_frequency(H,fs)
+    return xhat
 
-N = 36
-fs, wavin = wavfile.read('myfile.wav')
-xhat,Ytot = codec0(wavin,h,M,N)
-wavfile.write('output.wav', fs, xhat.astype(np.int16))
-
-wavin = wavin.astype(np.int64)
-xhat = xhat.astype(np.int64)
-
-min_mse, min_i = np.mean(np.square(wavin-xhat)), 0
-for i in np.arange(1,1000):
-  tmp_wavin, tmp_xhat = wavin[i:], xhat[:-i]
-  e = tmp_wavin - tmp_xhat 
-  mse = np.mean(np.square(e))
-  if mse < min_mse:
-    min_mse, min_i = mse, i
-
-SNR = np.mean(np.square(wavin[min_i:])) / min_mse
-SNRdb = 10*np.log10(SNR)
