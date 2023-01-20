@@ -44,11 +44,11 @@ def codec0(wavin, h, M, N):
     i = 0
     Ytot = np.empty((0,M))
 
-    while (i+1)*xbuffsize + L - M <= wavin.shape[0]:
-        if (i+1)*xbuffsize + L - M == wavin.shape[0]:
-            xbuff = np.r_[wavin[i*xbuffsize:(i+1)*xbuffsize],np.zeros(L-M)]
-        else:
+    while (i+1)*xbuffsize <= wavin.shape[0]:
+        if (i+1)*xbuffsize + L - M <= wavin.shape[0]:
             xbuff = wavin[i*xbuffsize:(i+1)*xbuffsize + L - M]
+        else:
+            xbuff = np.r_[wavin[i*xbuffsize:(i+1)*xbuffsize],np.zeros(L-M)]
         Y = frame_sub_analysis(xbuff,H,N)        
         Yc = donothing(Y)
         Ytot = np.r_[Ytot,Yc]
@@ -64,11 +64,11 @@ def codec0(wavin, h, M, N):
     
     i = 0
     xhat = np.empty(0)
-    while (i+1)*ybuffsize + L//M - 1 <= Ytot.shape[0]:
-        if (i+1)*ybuffsize + L//M - 1 == Ytot.shape[0]:
-            ybuff = np.r_[Yhtot[i*ybuffsize:(i+1)*ybuffsize, :],np.zeros((L//M - 1,M))]
-        else:
+    while (i+1)*ybuffsize <= Ytot.shape[0]:
+        if (i+1)*ybuffsize + L//M - 1 <= Ytot.shape[0]:
             ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M - 1, :]
+        else:
+            ybuff = np.r_[Yhtot[i*ybuffsize:(i+1)*ybuffsize, :],np.zeros((L//M - 1,M))]
         xsynth = frame_sub_synthesis(ybuff,G)
         xhat = np.r_[xhat,xsynth]
         i = i + 1
