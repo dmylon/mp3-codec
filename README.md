@@ -44,4 +44,4 @@ To run the code, open a terminal, navigate to the local folder the project is sa
 - python main.py
 
 ### Results
-After running this command, you should be able to view some basic diagrams containg the subband analysis in both the f(Hz) and the z frequency(barks). In addition, the audio file "output.wav" contains the decoded version of the original "myfile.wav" signal.
+After running this command, you should be able to view some basic diagrams containg the subband analysis in both the f(Hz) and the z frequency(barks). In addition, the  "output.wav" audio file is a representation of the audio data after it has been encoded and decoded from the original version in the "myfile.wav" file.
