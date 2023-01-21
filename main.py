@@ -30,9 +30,10 @@ mse = np.mean(np.square(e))
 SNR = np.mean(np.square(wavin[lag:])) / mse
 SNRdb = 10*np.log10(SNR)
 
-print("SNR = ",SNR)
+print("SNR = {:.2f}".format(SNR))
 
 c = frameDCT(Ytot[0:N,:])
 Yh = iframeDCT(c,N,M)
 P = DCTpower(c)
-
+D = Dksparse(M*N-1)
+ST = STinit(c,D)
