@@ -32,4 +32,4 @@ SNRdb = 10*np.log10(SNR)
 print("SNR = ",SNR)
 
 c = frameDCT(Ytot[0:N,:])
-print(c)
+Yh = iframeDCT(c,N,M)
