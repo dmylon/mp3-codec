@@ -82,10 +82,10 @@ def decoder0(Ytot, h, M, N):
     i = 0
     xhat = np.empty(0)
     while (i+1)*ybuffsize <= Ytot.shape[0]:
-        if (i+1)*ybuffsize + L//M - 1 <= Ytot.shape[0]:
-            ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M - 1, :]
+        if (i+1)*ybuffsize + L//M <= Ytot.shape[0]:
+            ybuff = Yhtot[i*ybuffsize:(i+1)*ybuffsize + L//M, :]
         else:
-            ybuff = np.r_[Yhtot[i*ybuffsize:(i+1)*ybuffsize, :],np.zeros((L//M - 1,M))]
+            ybuff = np.r_[Yhtot[i*ybuffsize:(i+1)*ybuffsize, :],np.zeros((L//M,M))]
         xsynth = frame_sub_synthesis(ybuff,G)
         xhat = np.r_[xhat,xsynth]
         i = i + 1
