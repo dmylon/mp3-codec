@@ -3,6 +3,7 @@ import numpy as np
 from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from subband import *
 from dct import *
+from psychoacoustic import *
 
 # calling the function
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -33,3 +34,5 @@ print("SNR = ",SNR)
 
 c = frameDCT(Ytot[0:N,:])
 Yh = iframeDCT(c,N,M)
+P = DCTpower(c)
+
