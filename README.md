@@ -42,3 +42,6 @@ Then, install the required dependencies by running the following command(assumin
 To run the code, open a terminal, navigate to the local folder the project is saved and run the following command:
 
 - python main.py
+
+### Results
+After running this command, you should be able to view some basic diagrams containg the subband analysis in both the f(Hz) and the z frequency(barks). In addition, the audio file "output.wav" contains the decoded version of the original "myfile.wav" signal.
