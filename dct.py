@@ -14,7 +14,7 @@ def frameDCT(Y):
     Ytrans = np.matmul(F,Y)
     c = np.reshape(Ytrans,(M*N,1),order='F')
 
-    return c
+    return c.squeeze()
 
 def iframeDCT(c,N,M):
     
