@@ -30,11 +30,13 @@ def STinit(c, D):
 
     P = DCTpower(c)
     Kmax,_ = D.shape
-
-    k = np.arange(0,Kmax)
-    idx = np.where(P[0:-1] > P[1:])
-
     
-    ST = idx
-
+    ST = np.empty(0)
+    for k in np.arange(3,Kmax-26):
+      if P[k] > P[k+1] and P[k] > P[k-1]:
+        Dk = np.where(D[k,:])
+        if P[k] > np.max(np.r_[P[k-Dk],P[k+Dk]]) + 7:
+           ST = np.r_[ST,k]
+        
     return ST
+
