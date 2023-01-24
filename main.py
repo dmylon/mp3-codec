@@ -40,4 +40,4 @@ D = Dksparse(M*N-1)
 ST = STinit(c,D).astype(np.int32)
 PM = MaskPower(c,ST)
 STr, PMr = STreduction(ST, c, Tq)
-# hello
+print(STr.shape,PMr.shape)
