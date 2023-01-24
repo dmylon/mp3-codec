@@ -64,12 +64,13 @@ def STreduction(ST, c, Tq):
   STr, PMr = ST[ind], PM[ind]
   f = ST*fs/(2*MN)
   z = Hz2Barks(f)
+    
+  while np.min(z[1:]-z[:-1]) < 0.5:
+    i = np.argmin(z[1:]-z[:-1])
+    if PMr[i+1] < PMr[i]:
+      i = i + 1 
+    z, STr, PMr = np.delete(z, i), np.delete(STr, i), np.delete(PMr, i)
+    
 
-  for i in np.arange(z.shape[0]-1):
-    if np.absolute(z[i] - z[i+1]) < 0.5:
-      r = i if PM[i] < PM[i+1] else i+1
-      ind = np.where(PM[r]==PMr)[0]
-      STr = np.delete(STr, ind)
-      PMr = np.delete(PMr, ind)
   return STr, PMr
 
