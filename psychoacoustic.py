@@ -38,7 +38,7 @@ def STinit(c, D):
         if P[k] > np.max(np.r_[P[k-Dk],P[k+Dk]]) + 7:
            ST = np.r_[ST,k]
         
-    return ST
+    return ST.astype(np.int32)
 
 
 def MaskPower(c, ST):
@@ -103,12 +103,29 @@ def Masking_Thresholds(ST, PM, Kmax):
 
   SF = SpreadFunc(ST,PM,Kmax)
   fs = 44100
-  TM = np.zeros((Kmax+1,len(ST)))
+  Ti = np.zeros((Kmax+1,len(ST)))
 
   for i in range(Kmax+1):
     for k in range(len(ST)):
       fi = fs/(2*(Kmax+1))*i
       fk = fs/(2*(Kmax+1))*k
-      TM[i, k] = PM[k] - 0.275*Hz2Barks(fk) + SF[i, k] - 6.025  
+      Ti[i, k] = PM[k] - 0.275*Hz2Barks(fk) + SF[i, k] - 6.025  
 
-  return TM     
+  return Ti
+
+
+def Global_Masking_Thresholds(Ti, Tq):
+  Tg = 10*np.log10(10**(0.1*Tq) +np.sum(10**(0.1*Ti),1))
+  return Tg
+
+def psycho(c,D):
+  
+  Kmax = len(c) - 1
+  Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
+  ST = STinit(c,D)
+  PM = MaskPower(c,ST)
+  STr,PMr = STreduction(ST,c,Tq)
+  Ti = Masking_Thresholds(STr,PMr,Kmax)
+  Tg = Global_Masking_Thresholds(Ti,Tq)
+
+  return Tg
