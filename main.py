@@ -4,6 +4,7 @@ from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from subband import *
 from dct import *
 from psychoacoustic import *
+import time
 
 # calling the function
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -14,7 +15,7 @@ fs = 44100
 H = make_mp3_analysisfb(h, M)
 G = make_mp3_synthesisfb(h, M)
 #plot_frequency(H,fs)
-
+begin = time.time()
 N = 36
 fs, wavin = wavfile.read('myfile.wav')
 xhat,Ytot = codec0(wavin,h,M,N)
@@ -41,3 +42,9 @@ ST = STinit(c,D).astype(np.int32)
 PM = MaskPower(c,ST)
 STr, PMr = STreduction(ST, c, Tq)
 print(STr.shape,PMr.shape)
+start = time.time()
+TM = Masking_Thresholds(STr, PMr, M*N-1)
+print(TM.shape)
+end = time.time()
+print("Time elapsed: ", end-start)
+print("Total time: ",end-begin)

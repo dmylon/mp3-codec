@@ -74,3 +74,41 @@ def STreduction(ST, c, Tq):
 
   return STr, PMr
 
+
+def SpreadFunc(ST, PM, Kmax):
+
+  fs = 44100  
+  SF = np.zeros((Kmax+1,len(ST)))
+
+
+  for i in range(Kmax+1):
+    for k in range(len(ST)):
+      fi = fs/(2*(Kmax+1))*i
+      fk = fs/(2*(Kmax+1))*k
+      Dz = Hz2Barks(fi) - Hz2Barks(fk)
+
+      if Dz >= -3 and Dz < -1:
+        SF[i,k] = 17*Dz - 0.4*PM[k] + 11
+      elif Dz >= -1 and Dz < 0:
+        SF[i,k] = (0.4*PM[k] + 6)*Dz
+      elif Dz >= 0 and Dz < 1:
+        SF[i,k] = -17*Dz
+      elif Dz >= 1 and Dz < 8:
+        SF[i,k] = (0.15*PM[k] -17)*Dz - 0.15*PM[k]
+      
+  return SF
+
+
+def Masking_Thresholds(ST, PM, Kmax):
+
+  SF = SpreadFunc(ST,PM,Kmax)
+  fs = 44100
+  TM = np.zeros((Kmax+1,len(ST)))
+
+  for i in range(Kmax+1):
+    for k in range(len(ST)):
+      fi = fs/(2*(Kmax+1))*i
+      fk = fs/(2*(Kmax+1))*k
+      TM[i, k] = PM[k] - 0.275*Hz2Barks(fk) + SF[i, k] - 6.025  
+
+  return TM     
