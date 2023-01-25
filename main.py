@@ -41,5 +41,5 @@ Tg = psycho(c,D)
 Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 print(Tg.shape)
 
-cb = critical_bands(M*N)
-print(cb[1:1000])
+cs,sc = DCT_band_scale(c)
+print(cs[:1000])

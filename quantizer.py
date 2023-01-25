@@ -18,5 +18,21 @@ def critical_bands(K):
                 break
             i = i + 1 
 
-    return cb        
+    return cb      
+
+
+def DCT_band_scale(c):
+
+    cb = critical_bands(len(c))
+    sc = np.array([0.0 for _ in range(np.max(cb))])
+    cs = np.array([0.0 for _ in range(len(cb))])
+
+    for i in range(np.max(cb)):
+        indexes = np.where(cb == i+1)
+        sc[i] =  np.max(np.absolute(c[indexes])**(3/4))
+
+    cs = np.sign(c)*np.absolute(c)**(3/4) / sc[cb-1]
+    
+    return cs,sc
+
         
