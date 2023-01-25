@@ -35,4 +35,31 @@ def DCT_band_scale(c):
     
     return cs,sc
 
+
+def quantizer(x, b):
+
+    wb = 2 / 2**(b)
+    d = np.array([-1])
+    symb_index = np.array([0 for _ in range(len(x))])
+
+    for i in range(-(2**(b-1)-1),(2**(b-1)-1)+1):
+        if i == 0:
+            continue
+
+        d = np.append(d,wb*i)
+
+    d = np.append(d,1)
+
+    for k in range(len(x)):
+        i = 0 
+        while True:
+            
+            if x[k] >= d[i] and x[k] <= d[i+1]:
+        
+                symb_index[k] = i - 2**(b-1) + 1
+                break
+            
+            i = i + 1
+
+    return symb_index
         

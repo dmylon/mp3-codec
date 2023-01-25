@@ -42,4 +42,5 @@ Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 print(Tg.shape)
 
 cs,sc = DCT_band_scale(c)
-print(cs[:1000])
+
+symb_index = quantizer(cs,5)
