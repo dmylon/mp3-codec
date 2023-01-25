@@ -4,7 +4,7 @@ from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from subband import *
 from dct import *
 from psychoacoustic import *
-import time
+from quantizer import *
 
 # calling the function
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -14,7 +14,6 @@ fs = 44100
 H = make_mp3_analysisfb(h, M)
 G = make_mp3_synthesisfb(h, M)
 #plot_frequency(H,fs)
-begin = time.time()
 N = 36
 fs, wavin = wavfile.read('myfile.wav')
 xhat,Ytot = codec0(wavin,h,M,N)
@@ -41,3 +40,6 @@ D = Dksparse(M*N-1)
 Tg = psycho(c,D)
 Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 print(Tg.shape)
+
+cb = critical_bands(M*N)
+print(cb[1:1000])
