@@ -34,9 +34,9 @@ git clone https://github.com/dmylon/mp3-codec.git
 
 Then, install the required dependencies by running the following command(assuming python is already installed on your local machine):
 
-- pip install -r numpy
-- pip install -r scipy
-- pip install -r matplotlib
+```pip install -r requirements.txt```
+
+
 
 ### Usage
 To run the code, open a terminal, navigate to the local folder the project is saved and run the following command:
