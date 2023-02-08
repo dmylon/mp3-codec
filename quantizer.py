@@ -38,7 +38,7 @@ def DCT_band_scale(c):
 
 def quantizer(x, b):
 
-    wb = 2 / 2**(b)
+    wb = 1 / (2**(b) - 1)
     d = np.array([-1])
     symb_index = np.array([0 for _ in range(len(x))])
 
@@ -77,7 +77,6 @@ def dequantizer(symb_index, b):
         d = np.append(d,wb*i)
     
     d = np.append(d,1)
-    print([d[i+1]-d[i] for i in range(len(d)-1)])
     for k in range(len(symb_index)):
         i = 0 
         while True:
@@ -90,3 +89,27 @@ def dequantizer(symb_index, b):
             i = i + 1
 
     return xh
+
+
+def all_bands_quantizer(c,Tg):
+    
+    cs,sc = DCT_band_scale(c)
+    cb = critical_bands(len(c))
+
+    B = 1
+    while True:
+        
+        symb_index = quantizer(cs,B)
+        csHat = dequantizer(symb_index,B)
+        cHat = np.sign(csHat)*np.array(((csHat*sc[cb-1]))**(4/3))
+        eb = np.absolute(c - cHat)
+        Pb = 10*np.log10(eb**2)
+
+
+        if len(np.where(Pb < Tg)) == len(Pb):
+            break
+
+        B = B + 1
+        print(B)
+
+    return symb_index,sc,B

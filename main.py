@@ -41,6 +41,4 @@ Tg = psycho(c,D)
 Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 print(Tg.shape)
 
-cs,sc = DCT_band_scale(c)
-
-symb_index = quantizer(cs,5)
+symb_index,sc,B = all_bands_quantizer(c,Tg)
