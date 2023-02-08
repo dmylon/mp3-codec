@@ -62,4 +62,31 @@ def quantizer(x, b):
             i = i + 1
 
     return symb_index
+
+
+
+def dequantizer(symb_index, b):
+
+    wb = 1 / (2**(b) - 1)
+    d = np.array([-1])
+    xh = np.array([0.0 for _ in range(len(symb_index))])
+
+    for i in range(-(2**(b-1)-1),(2**(b-1)-1)+1):
+        if i == 0:
+            continue
+        d = np.append(d,wb*i)
+    
+    d = np.append(d,1)
+    print([d[i+1]-d[i] for i in range(len(d)-1)])
+    for k in range(len(symb_index)):
+        i = 0 
+        while True:
         
+            if symb_index[k] == i - 2**(b-1) + 1:
+    
+                xh[k] = (d[i+1] + d[i]) / 2 
+                break
+        
+            i = i + 1
+
+    return xh
