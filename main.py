@@ -5,6 +5,7 @@ from subband import *
 from dct import *
 from psychoacoustic import *
 from quantizer import *
+from rle import *
 
 # calling the function
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -41,3 +42,6 @@ Tg = psycho(c,D)
 Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 
 symb_index,sc,B = all_bands_quantizer(c,Tg)
+
+run_symbols = RLE(symb_index,M*N)
+symb_new = iRLE(run_symbols,M*N)
