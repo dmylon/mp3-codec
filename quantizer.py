@@ -115,7 +115,6 @@ def all_bands_quantizer(c,Tg):
             break
 
         B = B + 1
-        print(B)
 
     return symb_index,sc,B
 
@@ -123,4 +122,4 @@ def all_bands_dequantizer(symb_index, B, SF):
     cb = critical_bands(len(symb_index))
     csHat = dequantizer(symb_index,B)
     cHat = np.sign(csHat) * np.array((np.abs(csHat)*SF[cb-1])**(4/3))
-    return symb_index
+    return cHat
