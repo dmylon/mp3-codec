@@ -115,7 +115,6 @@ def all_bands_quantizer(c,Tg):
             break
 
         B = B + 1
-           
 
     return symb_index,sc,B
 
