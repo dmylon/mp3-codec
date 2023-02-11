@@ -17,6 +17,7 @@ G = make_mp3_synthesisfb(h, M)
 N = 36
 fs, wavin = wavfile.read('myfile.wav')
 xhat,Ytot = codec0(wavin,h,M,N)
+
 wavfile.write('output.wav', fs, xhat.astype(np.int16))
 
 wavin = wavin.astype(np.int64)
@@ -30,9 +31,9 @@ mse = np.mean(np.square(e))
 SNR = np.mean(np.square(wavin[lag:])) / mse
 SNRdb = 10*np.log10(SNR)
 
-print("SNR = {:.2f}".format(SNR))
+print("SNR = {:.2f}".format(SNRdb))
 
-c = frameDCT(Ytot[0:N,:])
+c = frameDCT(Ytot[:N,:])
 Yh = iframeDCT(c,N,M)
 P = DCTpower(c)
 D = Dksparse(M*N-1)
@@ -40,23 +41,5 @@ D = Dksparse(M*N-1)
 Tg = psycho(c,D)
 Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 
-# T1 = np.where(np.isnan(Tq))
-# T1c = np.count_nonzero(T1)
-# T2 = np.where(np.isnan(Tg))
-# T2c = np.count_nonzero(T2)
-# print("eimai alogo")
-# print(Tg.shape)
-
-# cs,sc = DCT_band_scale(c)
-# b = 0
-# for i in np.arange(1,11):
-#     b = b + 1
-#     symb_index = quantizer(cs, b)
-#     cshat = dequantizer(symb_index, b)
-#     e = cs - cshat
-#     mse = np.mean(np.square(e))
-
-#     SNR = 10*np.log10(np.mean(np.square(cshat)) / mse)
-#     print("SNR = {0}, b = {1}".format(SNR,b))
-
 symb_index,sc,B = all_bands_quantizer(c,Tg)
+xh = all_bands_dequantizer(symb_index, B, sc)

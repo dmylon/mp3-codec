@@ -53,7 +53,7 @@ def quantizer(x, b):
     for k in range(len(x)):
         i = 0 
         while True:
-            
+
             if x[k] >= d[i] and x[k] <= d[i+1]:
         
                 symb_index[k] = i - 2**(b-1) + 1
@@ -115,7 +115,7 @@ def all_bands_quantizer(c,Tg):
             break
 
         B = B + 1
-        print(B)
+           
 
     return symb_index,sc,B
 
@@ -123,4 +123,4 @@ def all_bands_dequantizer(symb_index, B, SF):
     cb = critical_bands(len(symb_index))
     csHat = dequantizer(symb_index,B)
     cHat = np.sign(csHat) * np.array((np.abs(csHat)*SF[cb-1])**(4/3))
-    return symb_index
+    return cHat
