@@ -62,7 +62,7 @@ def STreduction(ST, c, Tq):
 
   ind = np.where(PM >= Tq[ST])
   STr, PMr = ST[ind], PM[ind]
-  f = ST*fs/(2*MN)
+  f = STr*fs/(2*MN)
   z = Hz2Barks(f)
     
   while np.min(z[1:]-z[:-1]) < 0.5:
@@ -76,26 +76,23 @@ def STreduction(ST, c, Tq):
 
 
 def SpreadFunc(ST, PM, Kmax):
-
   fs = 44100  
   SF = np.zeros((Kmax+1,len(ST)))
 
+  i = np.arange(Kmax+1)
 
-  for i in range(Kmax+1):
-    for k in range(len(ST)):
-      fi = fs/(2*(Kmax+1))*i
-      fk = fs/(2*(Kmax+1))*k
-      Dz = Hz2Barks(fi) - Hz2Barks(fk)
-
-      if Dz >= -3 and Dz < -1:
-        SF[i,k] = 17*Dz - 0.4*PM[k] + 11
-      elif Dz >= -1 and Dz < 0:
-        SF[i,k] = (0.4*PM[k] + 6)*Dz
-      elif Dz >= 0 and Dz < 1:
-        SF[i,k] = -17*Dz
-      elif Dz >= 1 and Dz < 8:
-        SF[i,k] = (0.15*PM[k] -17)*Dz - 0.15*PM[k]
-      
+  fi = fs/(2*(Kmax+1))*i
+  for k in np.arange(len(ST)):
+    fk = fs/(2*(Kmax+1))*k
+    Dz = Hz2Barks(fi) - Hz2Barks(fk)
+    case1 = np.where((Dz>=-3)&(Dz<-1))
+    case2 = np.where((Dz>=-1)&(Dz<0))
+    case3 = np.where((Dz>=0)&(Dz<1))
+    case4 = np.where((Dz>=1)&(Dz<8))
+    SF[case1 ,k] = 17*Dz[case1] - 0.4*PM[k] + 11
+    SF[case2, k] = (0.4*PM[k] + 6)*Dz[case2]
+    SF[case3, k] = -17*Dz[case3]
+    SF[case4, k] = (0.15*PM[k] - 17)*Dz[case4] - 0.15*PM[k]
   return SF
 
 
@@ -104,13 +101,10 @@ def Masking_Thresholds(ST, PM, Kmax):
   SF = SpreadFunc(ST,PM,Kmax)
   fs = 44100
   Ti = np.zeros((Kmax+1,len(ST)))
-
-  for i in range(Kmax+1):
-    for k in range(len(ST)):
-      fi = fs/(2*(Kmax+1))*i
-      fk = fs/(2*(Kmax+1))*k
-      Ti[i, k] = PM[k] - 0.275*Hz2Barks(fk) + SF[i, k] - 6.025  
-
+  i = np.arange(Kmax+1)
+  for k in np.arange(len(ST)):
+    fk = fs/(2*(Kmax+1))*k
+    Ti[i,k] = PM[k] - 0.275*Hz2Barks(fk) + SF[i,k] - 6.025     
   return Ti
 
 

@@ -5,6 +5,10 @@ from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from nothing import donothing,idonothing
 from frame import frame_sub_analysis,frame_sub_synthesis
 
+from dct import *
+from psychoacoustic import *
+from quantizer import *
+from rle import *
 
 def plot_frequency(H,fs):
 
@@ -73,9 +77,19 @@ def decoder0(Ytot, h, M, N):
 
     i = 0
     Yhtot = np.empty((0,M))
+    D = Dksparse(M*N - 1)
     while (i+1)*ybuffsize <= Ytot.shape[0]:
         Yc = Ytot[i*ybuffsize:(i+1)*ybuffsize, :]
-        Yh = idonothing(Yc)
+        c = frameDCT(Yc)
+        Tg = psycho(c,D)
+        symb_index,sc,B = all_bands_quantizer(c, Tg)
+        run_symbols = RLE(symb_index,M*N)
+        
+        symb_new = iRLE(run_symbols,M*N)
+        xh = all_bands_dequantizer(symb_new, B, sc)
+        Yh = iframeDCT(xh, N, M)
+        print(i)
+        
         Yhtot = np.r_[Yhtot,Yh]
         i = i + 1
 

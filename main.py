@@ -34,15 +34,15 @@ SNRdb = 10*np.log10(SNR)
 
 print("SNR = {:.2f}".format(SNRdb))
 
-c = frameDCT(Ytot[:N,:])
-Yh = iframeDCT(c,N,M)
-P = DCTpower(c)
-D = Dksparse(M*N-1)
+# c = frameDCT(Ytot[:N,:])
+# Yh = iframeDCT(c,N,M)
+# P = DCTpower(c)
+# D = Dksparse(M*N-1)
 
-Tg = psycho(c,D)
-Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
+# Tg = psycho(c,D)
+# Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
 
-symb_index,sc,B = all_bands_quantizer(c,Tg)
+# symb_index,sc,B = all_bands_quantizer(c,Tg)
 
-run_symbols = RLE(symb_index,M*N)
-symb_new = iRLE(run_symbols,M*N)
+# run_symbols = RLE(symb_index,M*N)
+# symb_new = iRLE(run_symbols,M*N)

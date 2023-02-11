@@ -6,18 +6,11 @@ def critical_bands(K):
 
     fs = 44100
     cb = np.array([0 for _ in range(K)])
-    for k in range(K):
-        
-        f = fs*k/(2*K)
-        #print(f)
-
-        i = 0 
-        while True:
-            if f >= cbands[i] and f <= cbands[i+1]:
-                cb[k] = i + 1
-                break
-            i = i + 1 
-
+    k = np.arange(K)
+    f = fs*k/(2*K)
+    for i in np.arange(len(cbands)-1):
+        idx = np.where((f>=cbands[i])&(f<cbands[i+1]))
+        cb[idx] = i + 1 
     return cb      
 
 
@@ -39,7 +32,7 @@ def DCT_band_scale(c):
 def quantizer(x, b):
 
     wb = 2 / (2**(b))
-    d = np.array([-1])
+    d = np.array([-np.inf])
     symb_index = np.array([0 for _ in range(len(x))])
 
     for i in range(-(2**(b-1)-1),(2**(b-1)-1)+1):
@@ -48,19 +41,12 @@ def quantizer(x, b):
 
         d = np.append(d,wb*i)
 
-    d = np.append(d,1)
+    d = np.append(d,np.inf)
 
-    for k in range(len(x)):
-        i = 0 
-        while True:
-
-            if x[k] >= d[i] and x[k] <= d[i+1]:
-        
-                symb_index[k] = i - 2**(b-1) + 1
-                break
-            
-            i = i + 1
-
+    for i in np.arange(len(d)-1):
+        idx = np.where((x>=d[i])&(x<d[i+1]))
+        symb_index[idx] = i - 2**(b-1) + 1
+    
     return symb_index
 
 
@@ -77,16 +63,9 @@ def dequantizer(symb_index, b):
         d = np.append(d,wb*i)
     
     d = np.append(d,1)
-    for k in range(len(symb_index)):
-        i = 0 
-        while True:
-        
-            if symb_index[k] == i - 2**(b-1) + 1:
-    
-                xh[k] = (d[i+1] + d[i]) / 2 
-                break
-        
-            i = i + 1
+    for i in np.arange(len(d)-1):
+        idx = np.where(symb_index==i - 2**(b-1) + 1)
+        xh[idx] = (d[i+1]+d[i])/2
 
     return xh
 
