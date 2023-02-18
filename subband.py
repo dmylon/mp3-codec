@@ -9,7 +9,7 @@ from dct import *
 from psychoacoustic import *
 from quantizer import *
 from rle import *
-
+from huffman import *
 
 def plot_frequency(H,fs):
 
@@ -102,6 +102,7 @@ def decoder0(Ytot, h, M, N):
         # run length encoding
         run_symbols = RLE(symb_index,M*N) 
         symb_new = iRLE(run_symbols,M*N)
+        frame_stream, frame_symbol_prob = huff(run_symbols)
         xh = all_bands_dequantizer(symb_new, B, sc)
         Yh = iframeDCT(xh, N, M)
         
