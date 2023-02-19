@@ -23,7 +23,7 @@ G = make_mp3_synthesisfb(h, M)
 # plotting analysis results
 plot_frequency(H,fs)
 fs, wavin = wavfile.read('myfile.wav')
-xhat,Ytot = codec0(wavin,h,M,N)
+xhat,Ytot,total_stream = codec0(wavin,h,M,N)
 
 # writing output file
 wavfile.write('output.wav', fs, xhat.astype(np.int16))
@@ -45,6 +45,8 @@ mse = np.mean(np.square(e))
 SNR = np.mean(np.square(wavin[lag:])) / mse
 SNRdb = 10*np.log10(SNR)
 print("SNR = {:.2f}".format(SNRdb))
+print("Compression rate: {:.3f}".format(len(wavin)*16/len(total_stream)))
+
 
 # c = frameDCT(Ytot[:N,:])
 # Yh = iframeDCT(c,N,M)
