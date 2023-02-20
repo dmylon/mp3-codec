@@ -20,7 +20,6 @@ G = make_mp3_synthesisfb(h, M)
 # plotting analysis results
 plot_frequency(H,fs)
 fs, wavin = wavfile.read('myfile.wav')
-# xhat,Ytot,total_stream = codec0(wavin,h,M,N)
 xhat, total_stream = MP3codec(wavin, h, M, N)
 # writing output file
 wavfile.write('output.wav', fs, xhat.astype(np.int16))
