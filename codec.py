@@ -12,7 +12,7 @@ def MP3codec(wavin, h, M, N):
 
     xhat = MP3decod(total_stream, total_frame_symbol_prob, stream_breakpoints, frame_symbol_prob_breakpoints, total_sc, total_B, h, M, N)
 
-    return total_stream, xhat
+    return xhat, total_stream
 
 def MP3cod(wavin, h, M, N):
     
@@ -24,7 +24,7 @@ def MP3cod(wavin, h, M, N):
     total_frame_symbol_prob = np.zeros((0,3))
     stream_breakpoints = np.zeros(1)
     frame_symbol_prob_breakpoints = np.zeros(1)
-    total_sc = np.zeros((0,25))
+    total_sc = np.zeros((0,max(critical_bands(M*N))))
     total_B = np.zeros(0)
     while (i+1)*N <= Ytot.shape[0]:
         Y = Ytot[i*N:(i+1)*N, :]
@@ -46,13 +46,13 @@ def MP3cod(wavin, h, M, N):
 
     return total_stream, total_frame_symbol_prob, stream_breakpoints.astype(np.int64), frame_symbol_prob_breakpoints.astype(np.int64), total_sc, total_B.astype(np.int64)
 
-def MP3decod(total_stream, frame_symbol_prob, stream_breakpoints, frame_symbol_prob_breakpoints, total_sc, total_B, h, M, N):
+def MP3decod(total_stream, total_frame_symbol_prob, stream_breakpoints, frame_symbol_prob_breakpoints, total_sc, total_B, h, M, N):
     
     Ytot = np.empty((0,M))
 
     for i in np.arange(len(stream_breakpoints)-1):
         frame_stream = total_stream[stream_breakpoints[i]:stream_breakpoints[i+1]]
-        frame_symbol_prob = frame_symbol_prob[frame_symbol_prob_breakpoints[i]:frame_symbol_prob_breakpoints[i+1],:]
+        frame_symbol_prob = total_frame_symbol_prob[frame_symbol_prob_breakpoints[i]:frame_symbol_prob_breakpoints[i+1],:]
         sc = total_sc[i,:]
         B = total_B[i]
 
@@ -62,7 +62,7 @@ def MP3decod(total_stream, frame_symbol_prob, stream_breakpoints, frame_symbol_p
         Y = iframeDCT(xh, N, M)
         
         Ytot = np.r_[Ytot,Y]
-        print("Decoding buffer {0}/{1}".format(i, len(stream_breakpoints) - 1))
+        print("Decoding buffer {0}/{1}".format(i+1, len(stream_breakpoints) - 1))
 
     xhat = decoder0(Ytot, h, M, N)
 
