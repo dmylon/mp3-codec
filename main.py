@@ -1,11 +1,8 @@
 from scipy.io import wavfile
 import numpy as np
 from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
-from subband import *
-from dct import *
-from psychoacoustic import *
-from quantizer import *
-from rle import *
+
+from codec import *
 
 # loading the coefficients
 data = np.load("h.npy", allow_pickle=True).tolist()
@@ -23,8 +20,8 @@ G = make_mp3_synthesisfb(h, M)
 # plotting analysis results
 plot_frequency(H,fs)
 fs, wavin = wavfile.read('myfile.wav')
-xhat,Ytot,total_stream = codec0(wavin,h,M,N)
-
+# xhat,Ytot,total_stream = codec0(wavin,h,M,N)
+xhat, total_stream = MP3codec(wavin, h, M, N)
 # writing output file
 wavfile.write('output.wav', fs, xhat.astype(np.int16))
 
@@ -46,17 +43,3 @@ SNR = np.mean(np.square(wavin[lag:])) / mse
 SNRdb = 10*np.log10(SNR)
 print("SNR = {:.2f}".format(SNRdb))
 print("Compression rate: {:.3f}".format(len(wavin)*16/len(total_stream)))
-
-
-# c = frameDCT(Ytot[:N,:])
-# Yh = iframeDCT(c,N,M)
-# P = DCTpower(c)
-# D = Dksparse(M*N-1)
-
-# Tg = psycho(c,D)
-# Tq = np.load("Tq.npy", allow_pickle=True).squeeze()
-
-# symb_index,sc,B = all_bands_quantizer(c,Tg)
-
-# run_symbols = RLE(symb_index,M*N)
-# symb_new = iRLE(run_symbols,M*N)

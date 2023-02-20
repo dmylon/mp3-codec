@@ -38,7 +38,6 @@ def huff(run_symbols):
         new_s = (s1,s2)
         new_p = p1+p2
         N = np.r_[N,np.array([(new_s, new_p)], dtype=object)]
-        # probs = np.array([n[1] for n in N])
         N = N[N[:,1].argsort()]
 
     huff_symbols = get_huff_symbols(N[0][0])

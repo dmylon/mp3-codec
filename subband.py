@@ -5,12 +5,6 @@ from mp3 import make_mp3_analysisfb, make_mp3_synthesisfb
 from nothing import donothing,idonothing
 from frame import frame_sub_analysis,frame_sub_synthesis
 
-from dct import *
-from psychoacoustic import *
-from quantizer import *
-from rle import *
-from huffman import *
-
 def plot_frequency(H,fs):
 
     # matrix to store 10log(|Hf|^2)
@@ -43,10 +37,9 @@ def codec0(wavin, h, M, N):
 
     # using coder and decoder functions to produce Ytot subband analysis and xhat recomposed signal
     Ytot = coder0(wavin,h,M,N)
-    xhat,total_stream = decoder0(Ytot, h, M, N)
+    xhat = decoder0(Ytot, h, M, N)
 
-    return xhat,Ytot, total_stream
-
+    return xhat,Ytot
 
 
 
@@ -88,29 +81,17 @@ def decoder0(Ytot, h, M, N):
 
     i = 0
     Yhtot = np.empty((0,M))
-    D = Dksparse(M*N - 1)
-    total_stream = ""
+
     # reading N samples until number of samples read <= number of rows of Ytot
     while (i+1)*ybuffsize <= Ytot.shape[0]:
         
         # extracting row
         Yc = Ytot[i*ybuffsize:(i+1)*ybuffsize, :]
-        c = frameDCT(Yc)
-        Tg = psycho(c,D)
-        symb_index,sc,B = all_bands_quantizer(c, Tg)
         
-        # run length encoding
-        run_symbols = RLE(symb_index,M*N) 
-        
-        frame_stream, frame_symbol_prob = huff(run_symbols)
-        total_stream = total_stream + frame_stream
-        new_run_symbols = ihuff(frame_stream, frame_symbol_prob)
-        symb_new = iRLE(new_run_symbols,M*N)
-        xh = all_bands_dequantizer(symb_new, B, sc)
-        Yh = iframeDCT(xh, N, M)
+        Yh = idonothing(Yc)
         
         Yhtot = np.r_[Yhtot,Yh]
-        print("Buffer {0}/{1}, stream length in bits: {2}".format(i, Ytot.shape[0]//ybuffsize,len(total_stream)))
+        
         i = i + 1
 
     i = 0
@@ -126,5 +107,5 @@ def decoder0(Ytot, h, M, N):
         xhat = np.r_[xhat,xsynth]
         i = i + 1
 
-    return xhat,total_stream
+    return xhat
 
