@@ -30,7 +30,7 @@ Before you can run this project, you will need to install the following dependen
 ### Installing
 Clone the repository to your local machine:
 
-git clone https://github.com/dmylon/mp3-codec.git
+```git clone https://github.com/dmylon/mp3-codec.git```
 
 Then, install the required dependencies by running the following command(assuming python is already installed on your local machine):
 
